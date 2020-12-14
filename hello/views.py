@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.template import loader
 import requests
 from .models import Greeting
+import random
 
 # Create your views here.
 def index(request):
@@ -21,4 +22,6 @@ def db(request):
     return render(request, "db.html", {"greetings": greetings})
 
 def grid(request):
-    return render(request, "grid.html")
+    scores = [round(random.uniform(0,20),2) for i in range(8)]
+    total = sum(scores)
+    return render(request, "grid.html", {"scores": scores, "total": total})
