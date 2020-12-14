@@ -19,3 +19,6 @@ def db(request):
     greetings = Greeting.objects.all()
 
     return render(request, "db.html", {"greetings": greetings})
+
+def grid(request):
+    return render(request, "grid.html")
