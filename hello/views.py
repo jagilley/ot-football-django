@@ -48,7 +48,9 @@ def get_name(request):
             # ...
             # redirect to a new URL:
             name = form.cleaned_data['your_name']
-            print(name)
+            new_user = User(name=name, email=f"{name}@demoemail.com", wins=0, losses=0)
+            new_user.save()
+            print(new_user.name, new_user.email)
             return HttpResponseRedirect('/thanks/')
 
     # if a GET (or any other method) we'll create a blank form
