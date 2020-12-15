@@ -1,0 +1,68 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.79.0">
+    <title>Grid Template · Bootstrap v5.0</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/grid/">
+
+    
+
+    <!-- Bootstrap core CSS -->
+<link href="{% static 'hello/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="{% static 'hello/grid.css' %}" rel="stylesheet" type="text/css">
+  </head>
+  <body class="py-4">
+    
+<main>
+    {% block title %}
+  <div class="container">
+
+    <h1>Playoff Fantasy Football</h1>
+    <p class="lead">Some sub-header might go here?</p>
+    <p>An announcement or something might go here</p>
+
+    <hr class="my-4">
+
+    <h2 class="mt-4">Global Leaderboard</h2>
+    <p>All users on ot.football and their total scores</p>
+    {% for leader_user in leader_users %}
+        <div class="row mb-3">
+        <div class="col-6 col-md-4 themed-grid-col">{{ leader_user.name }}</div>
+        <div class="col-6 col-md-4 themed-grid-col">{{ leader_user.wins }}-{{ leader_user.losses }}</div>
+        <div class="col-6 col-md-4 themed-grid-col">{{ leader_user.total_points }}</div>
+        </div>
+    {% endfor %}
+    {% endblock %}
+
+    
+</main>
+
+
+    
+  </body>
+</html>

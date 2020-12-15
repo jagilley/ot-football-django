@@ -21,5 +21,6 @@ urlpatterns = [
     path("register/", hello.views.register, name="register"),
     path("register-me/", hello.views.process_reg, name="process_reg"),
     path("name/", hello.views.get_name, name="name"),
+    path("leaderboard/", hello.views.leaderboard, name="leaderboard"),
     path("admin/", admin.site.urls),
 ]

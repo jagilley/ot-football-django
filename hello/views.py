@@ -37,6 +37,10 @@ def grid(request):
     total = round(sum(scores),2)
     return render(request, "grid.html", {"scores": scores, "total": total, "name": my_name})
 
+def leaderboard(request):
+    userz = User.objects.all()
+    return render(request, "users.html", {"leader_users": userz})
+
 def get_name(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -48,7 +52,7 @@ def get_name(request):
             # ...
             # redirect to a new URL:
             name = form.cleaned_data['your_name']
-            new_user = User(name=name, email=f"{name}@demoemail.com", wins=0, losses=0)
+            new_user = User(name=name, email=f"{name}@demoemail.com", wins=0, losses=0, total_points=0.0)
             new_user.save()
             print(new_user.name, new_user.email)
             return HttpResponseRedirect('/thanks/')

@@ -9,3 +9,4 @@ class User(models.Model):
     email = models.CharField(max_length=40)
     wins = models.IntegerField()
     losses = models.IntegerField()
+    total_points = models.FloatField()
