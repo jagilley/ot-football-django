@@ -39,6 +39,7 @@
   <body class="py-4">
     
 <main>
+    {% block title %}
   <div class="container">
 
     <h1>Playoff Fantasy Football</h1>
@@ -47,9 +48,9 @@
 
     <hr class="my-4">
 
-    <h2 class="mt-4">Jasper's Playoff Fantasy Team</h2>
+    <h2 class="mt-4">{{ name }}'s Playoff Fantasy Team</h2>
     <p>Some explanation of the rules or something goes here</p>
-    {% block title %}
+    
     <div class="row mb-3">
       <div class="col-6 col-md-4 themed-grid-col">QB</div>
       <div class="col-6 col-md-4 themed-grid-col">Patrick Mahomes</div>
