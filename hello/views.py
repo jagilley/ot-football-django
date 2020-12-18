@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 import requests
-from .models import Greeting, User
-from .forms import NameForm
+import string
+import django
+from .models import Greeting, League, User
+from .forms import *
 import random
 
 # Create your views here.
@@ -48,17 +50,33 @@ def get_name(request):
         form = NameForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            name = form.cleaned_data['your_name']
-            new_user = User(name=name, email=f"{name}@demoemail.com", wins=0, losses=0, total_points=0.0)
+            all_leagues = League.objects.filter(league_code=form.cleaned_data['league_code'])
+            if len(all_leagues) == 1:
+                my_league = all_leagues[0]
+            elif len(all_leagues) == 0:
+                print("No league with this code")
+            elif len(all_leagues) > 1:
+                print("Multiple leagues with league code")
+            new_user = User(
+                name=form.cleaned_data['your_name'],
+                email=form.cleaned_data['your_email'],
+                league_code=my_league,
+                wins=0,
+                losses=0,
+                total_points=0.0
+            )
             new_user.save()
-            print(new_user.name, new_user.email)
             return HttpResponseRedirect('/thanks/')
 
-    # if a GET (or any other method) we'll create a blank form
+def create_league(request):
+    if request.method == "POST":
+        random_4_code = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
+        form = LeagueModelForm(request.POST)
+        if form.is_valid():
+            new_league = form.save(commit=False)
+            new_league.league_code = random_4_code
+            new_league.save()
     else:
-        form = NameForm()
+        form = LeagueModelForm()
 
-    return render(request, 'name.html', {'form': form})
+    return render(request, 'create_league.html', {'form': form})
