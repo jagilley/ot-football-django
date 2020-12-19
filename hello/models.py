@@ -25,7 +25,7 @@ class User(models.Model):
     name = models.CharField(max_length=30)
     email = models.EmailField()
     league_code = models.CharField(max_length=10, default="0000")
-    league_model = models.ForeignKey(League, on_delete=models.CASCADE, default=1)
+    #league_model = models.ForeignKey(League, on_delete=models.CASCADE, default=1)
     wins = models.IntegerField()
     losses = models.IntegerField()
     total_points = models.FloatField()
