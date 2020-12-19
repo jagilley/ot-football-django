@@ -16,12 +16,9 @@ def index(request):
 
 
 def db(request):
-
     greeting = Greeting()
     greeting.save()
-
     greetings = Greeting.objects.all()
-
     return render(request, "db.html", {"greetings": greetings})
 
 def register(request):
@@ -56,7 +53,8 @@ def get_name(request):
             elif len(all_leagues) == 0:
                 print("No league with this code")
             elif len(all_leagues) > 1:
-                print("Multiple leagues with league code")
+                print("Multiple leagues with league code, choosing first")
+                my_league = all_leagues[0]
             new_user = User(
                 name=form.cleaned_data['your_name'],
                 email=form.cleaned_data['your_email'],
@@ -67,6 +65,9 @@ def get_name(request):
             )
             new_user.save()
             return HttpResponseRedirect('/thanks/')
+    else:
+        form = NameForm()
+        return render(request, "name.html", {"form": form})
 
 def create_league(request):
     if request.method == "POST":
@@ -78,5 +79,4 @@ def create_league(request):
             new_league.save()
     else:
         form = LeagueModelForm()
-
     return render(request, 'create_league.html', {'form': form})
