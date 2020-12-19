@@ -7,6 +7,10 @@ class Greeting(models.Model):
 class League(models.Model):
     league_name = models.CharField(default="defaultname", max_length=50)
     league_code = models.CharField(default="0000", max_length=10)
+
+default_league = League()
+default_league.save()
+
 """
 class User(models.Model):
     name = models.CharField(max_length=30)
