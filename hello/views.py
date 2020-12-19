@@ -29,7 +29,6 @@ def process_reg(request):
     return render(request, "register.html")
 
 def grid(request):
-    print("test!!")
     my_user = User(name="Jasper Gilley", email="myemail@gmail.com")
     my_name = my_user.name
     scores = [round(random.uniform(0,20),2) for i in range(8)]
