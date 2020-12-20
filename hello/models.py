@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Greeting(models.Model):
@@ -28,7 +29,16 @@ class UserExt(models.Model):
     email = models.EmailField()
     team_name = models.CharField(max_length=40, default="")
     league_code = models.CharField(max_length=10, default="0000")
-    #league_model = models.ForeignKey(League, on_delete=models.CASCADE, default=1)
+    #league_model = models.ForeignKey(League, on_delete=models.CASCADE)
+    wins = models.IntegerField()
+    losses = models.IntegerField()
+    total_points = models.FloatField()
+
+class UserProfile(models.Model):
+    usr = models.OneToOneField(User, on_delete=models.CASCADE)
+    usrname = models.CharField(max_length=40, default="")
+    team_name = models.CharField(max_length=40, default="")
+    leagues = models.ManyToManyField(League)
     wins = models.IntegerField()
     losses = models.IntegerField()
     total_points = models.FloatField()

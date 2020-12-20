@@ -4,7 +4,7 @@ from django.template import loader
 import requests
 import string
 import django
-from .models import Greeting, League, UserExt
+from .models import Greeting, League, UserExt, UserProfile
 from .forms import *
 import random
 import itertools
@@ -80,10 +80,11 @@ def league_page(request, league_code="foobar"):
         my_league = League.objects.get(league_code=league_code)
     except IndexError:
         raise AssertionError("League code not found")
-
+    league_profiles = [usr.usrname for usr in UserProfile.objects.filter(leagues=my_league)]
     return render(request, "league_page.html", {
         "header_bold": f"{my_league.league_name} - League Standings",
         "header_reg": (f"League code {my_league.league_code}, ") + ("publicly joinable" if my_league.publicly_joinable else "not publicly joinable"),
+        "header_reg2": "League members: " + " ".join(league_profiles),
         "grid_items": [
             list(range(3)),
             list(range(3))
@@ -111,7 +112,30 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
+            profile = UserProfile(
+                usr=user,
+                usrname=username,
+                wins=0,
+                losses=0,
+                total_points=0.0
+            )
+            profile.save()
             return redirect("/")
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+def join_league(request):
+    if request.method == "POST":
+        form = JoinLeagueForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            code = form.cleaned_data['league_code']
+            this_league = League.objects.get(league_code=code)
+            user_obj = User.objects.get(username=username)
+            profile = UserProfile.objects.get(usr=user_obj)
+            profile.leagues.add(this_league)
+            profile.save()
+    else:
+        form = JoinLeagueForm()
+    return render(request, "join_league.html", {"form": form})

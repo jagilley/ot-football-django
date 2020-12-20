@@ -1,40 +1,6 @@
-{% load static %}
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.79.0">
-    <title>Overtime Football</title>
+{% extends 'base.html' %}
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/grid/">
-
-<link href="{% static 'hello/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
-
-    <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-    </style>
-
-    
-    <!-- Custom styles for this template -->
-    <link href="{% static 'hello/grid.css' %}" rel="stylesheet" type="text/css">
-  </head>
-  <body class="py-4">
-    
+{% block content %}
 <main>
     {% block title %}
   <div class="container">
@@ -47,6 +13,7 @@
 
     <h2 class="mt-4">{{ header_bold }}</h2>
     <p>{{ header_reg }}</p>
+    <p>{{ header_reg2 }}</p>
 
     {% for item in grid_items %}
     <div class="row mb-4">
@@ -60,8 +27,4 @@
 
     
 </main>
-
-
-    
-  </body>
-</html>
+{% endblock %}

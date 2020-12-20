@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+  <body class="bg-light">
+{% block content %}
+  <div class="container">
+
+
+<h2>Join League</h2>
+<div class="row">
+    <div class="col-md">
+<form action="/join_league/" method="post" class="needs-validation">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" class="form-control">
+</form>
+
+</div></div></div>
+
+{% endblock %}
+</html>

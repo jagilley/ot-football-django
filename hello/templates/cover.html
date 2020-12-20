@@ -43,7 +43,13 @@
       <nav class="nav nav-masthead justify-content-center float-md-end">
         <a class="nav-link active" aria-current="page" href="#">About</a>
         <a class="nav-link" href="/create_league">Register League</a>
+        {% if not user.is_authenticated %}
         <a class="nav-link" href="/name">Register Player</a>
+        {% endif %}
+        <a class="nav-link" href="/join_league">Join League</a>
+        {% if user.is_authenticated %}
+        <a class="nav-link" href="/my_leagues">My Leagues</a>
+        {% endif %}
         {% if user.is_authenticated %}
         <a class="nav-link" href="/accounts/logout">Logout</a>
         {% else %}
