@@ -1,7 +1,7 @@
 from django import forms
 from django.db import models
 from django.forms import ModelForm
-from .models import User, League
+from .models import UserExt, League
 
 class NameForm(forms.Form):
     your_name = forms.CharField(label='Your name', max_length=100)
@@ -18,5 +18,5 @@ class LeagueModelForm(ModelForm):
 
 class UserModelForm(ModelForm):
     class Meta:
-        model = User
+        model = UserExt
         fields = ["name", "email", "league_code"]

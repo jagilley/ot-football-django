@@ -4,16 +4,13 @@ from django.template import loader
 import requests
 import string
 import django
-from .models import Greeting, League, User
+from .models import Greeting, League, UserExt
 from .forms import *
 import random
 
 # Create your views here.
 def index(request):
-    #r = requests.get('http://httpbin.org/status/418')
-    #template = loader.get_template('templates/base.html')
     return render(request, "cover.html")
-
 
 def db(request):
     greeting = Greeting()
@@ -29,14 +26,14 @@ def process_reg(request):
     return render(request, "register.html")
 
 def grid(request):
-    my_user = User(name="Jasper Gilley", email="myemail@gmail.com")
+    my_user = UserExt(name="Jasper Gilley", email="myemail@gmail.com")
     my_name = my_user.name
     scores = [round(random.uniform(0,20),2) for i in range(8)]
     total = round(sum(scores),2)
     return render(request, "grid.html", {"scores": scores, "total": total, "name": my_name})
 
 def leaderboard(request):
-    userz = User.objects.all()
+    userz = UserExt.objects.all()
     return render(request, "users.html", {"leader_users": userz})
 
 def get_name(request):
@@ -54,7 +51,7 @@ def get_name(request):
             elif len(all_leagues) > 1:
                 print("Multiple leagues with league code, choosing first")
                 my_league = all_leagues[0]
-            new_user = User(
+            new_user = UserExt(
                 name=form.cleaned_data['your_name'],
                 email=form.cleaned_data['your_email'],
                 league_code=my_league,
