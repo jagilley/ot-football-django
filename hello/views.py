@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 import requests
@@ -76,3 +76,35 @@ def create_league(request):
     else:
         form = LeagueModelForm()
     return render(request, 'create_league.html', {'form': form})
+
+def league_page(request, league_code="foobar"):
+    try:
+        my_league = League.objects.filter(league_code=league_code)[0]
+    except IndexError:
+        raise AssertionError("League code not found")
+
+    return render(request, "league_page.html", {
+        "header_bold": f"{my_league.league_name} - League Standings",
+        "header_reg": (f"League code {my_league.league_code}, ") + ("publicly joinable" if my_league.publicly_joinable else "not publicly joinable"),
+        "grid_items": [
+            list(range(3)),
+            list(range(3))
+        ]
+    })
+
+from django.contrib.auth import login, authenticate
+from hello.forms import SignUpForm
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect("/")
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})

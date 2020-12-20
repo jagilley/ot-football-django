@@ -33,18 +33,9 @@
       }
     </style>
 
-    
-    <!-- Custom styles for this template -->
     <link href="{% static 'hello/cover.css' %}" rel="stylesheet" type="text/css">
   </head>
   <body class="d-flex h-100 text-center text-white bg-dark">
-<!--
-    <div
-    class="p-1 bg-image"
-    style="
-      background-image: url('https://static01.nyt.com/images/2020/02/02/multimedia/02superbowl/02superbowl-superJumbo.jpg');
-    "
-  >-->
 <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
   <header class="mb-auto">
     <div>
@@ -53,8 +44,18 @@
         <a class="nav-link active" aria-current="page" href="#">About</a>
         <a class="nav-link" href="/create_league">Register League</a>
         <a class="nav-link" href="/name">Register Player</a>
-        <a class="nav-link" href="#">Login</a>
+        {% if user.is_authenticated %}
+        <a class="nav-link" href="/accounts/logout">Logout</a>
+        {% else %}
+        <a class="nav-link" href="/accounts/login">Login</a>
+        {% endif %}
       </nav>
+      {% if user.is_authenticated %}
+        <p>Logged in as {{ user.get_username }}</p>
+        {% endif %}
+    </div>
+    <div>
+      
     </div>
   </header>
 
@@ -67,12 +68,8 @@
   </main>
 
   <footer class="mt-auto text-white-50">
-    <p>Created in Evanston, IL</a>.</p>
+    <p><a href="https://www.google.com/maps/place/42%C2%B003'04.0%22N+87%C2%B040'38.0%22W/@42.051116,-87.6777802,19z">Created in Evanston, IL</a></p>
   </footer>
 </div>
-
-
-
-    
   </body>
 </html>
