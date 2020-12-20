@@ -12,7 +12,7 @@ import random
 def index(request):
     #r = requests.get('http://httpbin.org/status/418')
     #template = loader.get_template('templates/base.html')
-    return render(request, "templates/base.html")
+    return render(request, "cover.html")
 
 
 def db(request):
