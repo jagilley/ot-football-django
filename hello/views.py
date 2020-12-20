@@ -7,16 +7,14 @@ import django
 from .models import Greeting, League, UserExt
 from .forms import *
 import random
+import itertools
+
+def transpose(a_list):
+    return list(map(list, itertools.zip_longest(*a_list, fillvalue=None)))
 
 # Create your views here.
 def index(request):
     return render(request, "cover.html")
-
-def db(request):
-    greeting = Greeting()
-    greeting.save()
-    greetings = Greeting.objects.all()
-    return render(request, "db.html", {"greetings": greetings})
 
 def register(request):
     return render(request, "register.html")
@@ -79,7 +77,7 @@ def create_league(request):
 
 def league_page(request, league_code="foobar"):
     try:
-        my_league = League.objects.filter(league_code=league_code)[0]
+        my_league = League.objects.get(league_code=league_code)
     except IndexError:
         raise AssertionError("League code not found")
 
@@ -90,6 +88,15 @@ def league_page(request, league_code="foobar"):
             list(range(3)),
             list(range(3))
         ]
+    })
+
+def public_leagues(request):
+    all_public_leagues = League.objects.filter(publicly_joinable=True)
+    data = [[leeg.league_name, leeg.league_code] for leeg in all_public_leagues]
+    return render(request, "league_page.html", {
+        "header_bold": "All Public Leagues",
+        "header_reg": "",
+        "grid_items": data
     })
 
 from django.contrib.auth import login, authenticate

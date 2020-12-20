@@ -26,7 +26,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path("league/<slug:league_code>/", hello.views.league_page),
-    path("signup/", hello.views.signup, name="signup")
+    path("signup/", hello.views.signup, name="signup"),
+    path("public/", hello.views.public_leagues, name="public")
 ]
 """
     ^ this includes:

@@ -14,7 +14,7 @@ class LeagueCreation(forms.Form):
 class LeagueModelForm(ModelForm):
     class Meta:
         model = League
-        fields = ["league_name"]
+        fields = ["league_name", "publicly_joinable"]
 
 class UserModelForm(ModelForm):
     class Meta:
