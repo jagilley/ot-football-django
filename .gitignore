@@ -5,4 +5,4 @@ staticfiles
 db.sqlite3
 getting-started/*
 .DS_Store
-gettingstarted/*
+#gettingstarted/*
