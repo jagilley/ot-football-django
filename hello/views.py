@@ -100,6 +100,16 @@ def public_leagues(request):
         "grid_items": data
     })
 
+def my_leagues(request):
+    my_user = request.user
+    my_profile = UserProfile.objects.get(usr=my_user)
+    my_leagues = [[leeg.league_name, leeg.league_code] for leeg in my_profile.leagues.all()]
+    return render(request, "league_page.html", {
+        "header_bold": "My Leagues",
+        "header_reg": "Leagues appear in order of joining",
+        "grid_items": my_leagues
+    })
+
 from django.contrib.auth import login, authenticate
 from hello.forms import SignUpForm
 

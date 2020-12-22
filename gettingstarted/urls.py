@@ -27,7 +27,8 @@ urlpatterns = [
     path("league/<slug:league_code>/", hello.views.league_page),
     path("signup/", hello.views.signup, name="signup"),
     path("public/", hello.views.public_leagues, name="public"),
-    path("join_league/", hello.views.join_league, name="join_league")
+    path("join_league/", hello.views.join_league, name="join_league"),
+    path("my_leagues/", hello.views.my_leagues, name="my_leagues")
 ]
 """
     ^ this includes:

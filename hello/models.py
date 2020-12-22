@@ -9,6 +9,7 @@ class League(models.Model):
     league_name = models.CharField(default="defaultname", max_length=50)
     league_code = models.CharField(default="0000", max_length=10)
     publicly_joinable = models.BooleanField(default=False)
+    #creator = models.ForeignKey(User, on_delete=models.CASCADE)
 
 #default_league = League()
 #default_league.save()
