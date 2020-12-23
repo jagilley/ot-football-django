@@ -29,15 +29,21 @@
       }
     </style>
 
-    
-    <!-- Custom styles for this template -->
     <link href="{% static 'hello/grid.css' %}" rel="stylesheet" type="text/css">
   </head>
   <body class="py-4">
-    
+    <main>
+      {% block title %}
+    <div class="container">
+  
+      <h1>Overtime Football</h1>
+      <p class="lead">Playoff Fantasy Football, Done Right</p>
+  
+      <hr class="my-4">
     {% block content %}{% endblock %}
 
 
     
   </body>
 </html>
+{% endblock %}

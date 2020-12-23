@@ -20,13 +20,6 @@ def transpose(a_list):
 def index(request):
     return render(request, "cover.html")
 
-def register(request):
-    return render(request, "register.html")
-
-def process_reg(request):
-    print(request)
-    return render(request, "register.html")
-
 def grid(request):
     my_user = UserExt(name="Jasper Gilley", email="myemail@gmail.com")
     my_name = my_user.name
@@ -107,14 +100,7 @@ def team_page(request, league_code="foobar", username="fobr"):
             user=my_profile,
             league=League.objects.get(league_code=league_code)
         )
-    """
-    df = pd.DataFrame(columns=["Name", "Number", "Position", "Height", "Weight", "Age", "Exp", "College"])
-    for thingythings in glob("hello/static/csv/*.csv"):
-        df2 = pd.read_csv(thingythings)
-        df2.columns = ["Name", "Number", "Position", "Height", "Weight", "Age", "Exp", "College"]
-        df = df.append(df2)
-    #print(random.choice(df[df["Position"] == "RB"]["Name"].tolist()))
-    """
+    
     df = pd.read_csv("hello/static/csv/all.csv")
     for k,v in my_team.players.items():
         try:
@@ -128,7 +114,6 @@ def team_page(request, league_code="foobar", username="fobr"):
         except IndexError:
             pass
 
-    my_team.save()
     round_number = 1
     players_list = [[k, v, player_scores_dummy(v, round_number)] for k,v in my_team.players.items()]
     return render(request, "league_page.html", {
