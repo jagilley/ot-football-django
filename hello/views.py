@@ -4,10 +4,14 @@ from django.template import loader
 import requests
 import string
 import django
-from .models import Greeting, League, UserExt, UserProfile
+from .models import Greeting, League, UserExt, UserProfile, Team
 from .forms import *
 import random
 import itertools
+from .scores import player_scores_dummy
+import pandas as pd
+from glob import glob
+from .equiv_pos import equiv_pos
 
 def transpose(a_list):
     return list(map(list, itertools.zip_longest(*a_list, fillvalue=None)))
@@ -89,6 +93,48 @@ def league_page(request, league_code="foobar"):
             list(range(3)),
             list(range(3))
         ]
+    })
+
+def team_page(request, league_code="foobar", username="fobr"):
+    my_user = request.user
+    my_profile = UserProfile.objects.get(usr=my_user)
+    try:
+        my_team = Team.objects.get(league_code=league_code, username=username)
+    except:
+        #raise AssertionError("Team with this league code / user not found")
+        my_team = Team(
+            team_name="Fighting 4 Percent Mexicans",
+            user=my_profile,
+            league=League.objects.get(league_code=league_code)
+        )
+    """
+    df = pd.DataFrame(columns=["Name", "Number", "Position", "Height", "Weight", "Age", "Exp", "College"])
+    for thingythings in glob("hello/static/csv/*.csv"):
+        df2 = pd.read_csv(thingythings)
+        df2.columns = ["Name", "Number", "Position", "Height", "Weight", "Age", "Exp", "College"]
+        df = df.append(df2)
+    #print(random.choice(df[df["Position"] == "RB"]["Name"].tolist()))
+    """
+    df = pd.read_csv("hello/static/csv/all.csv")
+    for k,v in my_team.players.items():
+        try:
+            my_team.players.update({
+                k: random.choice(
+                    df[(df["Position"].isin(equiv_pos[k]))]["Name"].tolist()
+                )
+            })
+        except KeyError:
+            print(k, equiv_pos[k])
+        except IndexError:
+            pass
+
+    my_team.save()
+    round_number = 1
+    players_list = [[k, v, player_scores_dummy(v, round_number)] for k,v in my_team.players.items()]
+    return render(request, "league_page.html", {
+        "header_bold": (my_team.team_name + " - Team Points"),
+        "header_reg": "More stuff here",
+        "grid_items": players_list
     })
 
 def public_leagues(request):

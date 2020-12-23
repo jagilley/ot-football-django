@@ -28,7 +28,8 @@ urlpatterns = [
     path("signup/", hello.views.signup, name="signup"),
     path("public/", hello.views.public_leagues, name="public"),
     path("join_league/", hello.views.join_league, name="join_league"),
-    path("my_leagues/", hello.views.my_leagues, name="my_leagues")
+    path("my_leagues/", hello.views.my_leagues, name="my_leagues"),
+    path("league/<slug:league_code>/<slug:username>/", hello.views.team_page, name="team_page")
 ]
 """
     ^ this includes:

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import json
 
 # Create your models here.
 class Greeting(models.Model):
@@ -43,3 +44,41 @@ class UserProfile(models.Model):
     wins = models.IntegerField()
     losses = models.IntegerField()
     total_points = models.FloatField()
+
+def def_team():
+    return {
+        "QB": "",
+        "RB1": "",
+        "RB2": "",
+        "WR1": "",
+        "WR2": "",
+        "TE": "",
+        "W/R": "",
+        "OL1": "",
+        "OL2": "",
+        "OL3": "",
+        "K": "",
+        "DT1": "",
+        "DE1": "",
+        "DE2": "",
+        "MLB1": "",
+        "MLB2": "",
+        "CB1": "",
+        "CB2": "",
+        "S1": "",
+        "S2": "",
+        "DST": ""
+    }
+
+class Team(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    username = models.CharField(max_length=40, default="")
+    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    league_code = models.CharField(default="0000", max_length=10)
+    team_name = models.CharField(max_length=40, default="")
+    eliminated = models.BooleanField(default=False)
+    pts_rd1 = models.FloatField(default=0)
+    pts_rd2 = models.FloatField(default=0)
+    pts_rd3 = models.FloatField(default=0)
+    pts_rd4 = models.FloatField(default=0)
+    players = models.JSONField(max_length=1000, default=def_team)
