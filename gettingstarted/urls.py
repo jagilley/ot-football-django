@@ -22,7 +22,7 @@ urlpatterns = [
     path("create_league/", hello.views.create_league, name="create_league"),
     path("admin/", admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path("league/<slug:league_code>/", hello.views.league_page),
+    path("league/<slug:league_code>/", hello.views.league_page, name="leaguepage"),
     path("signup/", hello.views.signup, name="signup"),
     path("public/", hello.views.public_leagues, name="public"),
     path("join_league/", hello.views.join_league, name="join_league"),

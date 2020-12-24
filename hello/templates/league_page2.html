@@ -1,0 +1,4 @@
+{% extends 'league_page.html' %}
+{% block extra_col %}
+<div class="col themed-grid-col"><a href="{% url 'team_page' league_code=leegcode  username=item.0 %}">Team page</a></div>
+{% endblock %}

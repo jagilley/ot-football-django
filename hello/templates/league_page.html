@@ -7,11 +7,18 @@
     <p>{{ header_reg }}</p>
     <p>{{ header_reg2 }}</p>
 
+    <div class="row mb-4">
+        {% for headers_value in table_headers %}
+        <div class="col themed-grid-col"><b>{{ headers_value }}</b></div>
+        {% endfor %}
+    </div>
+
     {% for item in grid_items %}
     <div class="row mb-4">
         {% for item_value in item %}
         <div class="col themed-grid-col">{{ item_value }}</div>
         {% endfor %}
+        {% block extra_col %}{% endblock %}
     </div>
     {% endfor %}
 

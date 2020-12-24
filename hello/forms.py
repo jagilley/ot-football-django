@@ -9,8 +9,9 @@ class NameForm(forms.Form):
     league_code = forms.CharField(label="League Code", max_length=10)
 
 class JoinLeagueForm(forms.Form):
-    username = forms.CharField(label="Username", max_length=30)
+    #username = forms.CharField(label="Username", max_length=30)
     league_code = forms.CharField(label="League Code", max_length=10)
+    team_name = forms.CharField(label="Team Name", max_length=40)
 
 """
 class LeagueCreation(forms.Form):

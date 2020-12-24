@@ -77,15 +77,16 @@ def league_page(request, league_code="foobar"):
         my_league = League.objects.get(league_code=league_code)
     except IndexError:
         raise AssertionError("League code not found")
-    league_profiles = [usr.usrname for usr in UserProfile.objects.filter(leagues=my_league)]
-    return render(request, "league_page.html", {
+    UserProfiles = UserProfile.objects.filter(leagues=my_league)
+    league_usrnames = [usr.usrname for usr in UserProfiles]
+    league_standings = [[usr.usrname, Team.objects.get(user=usr, league=my_league).team_name, f"{usr.wins}-{usr.losses}", usr.total_points] for usr in UserProfiles]
+    return render(request, "league_page2.html", {
         "header_bold": f"{my_league.league_name} - League Standings",
-        "header_reg": (f"League code {my_league.league_code}, ") + ("publicly joinable" if my_league.publicly_joinable else "not publicly joinable"),
-        "header_reg2": "League members: " + " ".join(league_profiles),
-        "grid_items": [
-            list(range(3)),
-            list(range(3))
-        ]
+        "header_reg": (f"League code {my_league.league_code}, ") + ("publicly joinable, " if my_league.publicly_joinable else "not publicly joinable, ") + "draft has " + ("already" if my_league.already_drafted else "not") + " taken place.",
+        "header_reg2": "League members: " + ", ".join(league_usrnames),
+        "table_headers": ["Username", "Team Name", "Record", "Total Points", "Team Page"],
+        "grid_items": league_standings,
+        "leegcode": my_league.league_code
     })
 
 def team_page(request, league_code="foobar", username="fobr"):
@@ -128,16 +129,18 @@ def public_leagues(request):
     return render(request, "league_page.html", {
         "header_bold": "All Public Leagues",
         "header_reg": "",
+        "table_headers": ["League Name", "League Code"],
         "grid_items": data
     })
 
 def my_leagues(request):
     my_user = request.user
     my_profile = UserProfile.objects.get(usr=my_user)
-    my_leagues = [[leeg.league_name, leeg.league_code] for leeg in my_profile.leagues.all()]
-    return render(request, "league_page.html", {
+    my_leagues = [[leeg.league_name, leeg.league_code, ] for leeg in my_profile.leagues.all()]
+    return render(request, "my_leagues2.html", {
         "header_bold": "My Leagues",
         "header_reg": "Leagues appear in order of joining",
+        "table_headers": ["League Name", "League Code", "League Page"],
         "grid_items": my_leagues
     })
 
@@ -170,13 +173,24 @@ def join_league(request):
     if request.method == "POST":
         form = JoinLeagueForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
+            my_user = request.user
+            my_profile = UserProfile.objects.get(usr=my_user)
+            #username = form.cleaned_data['username']
             code = form.cleaned_data['league_code']
+            team_name = form.cleaned_data["team_name"]
             this_league = League.objects.get(league_code=code)
-            user_obj = User.objects.get(username=username)
-            profile = UserProfile.objects.get(usr=user_obj)
-            profile.leagues.add(this_league)
-            profile.save()
+            #user_obj = User.objects.get(username=username)
+            #profile = UserProfile.objects.get(usr=user_obj)
+            my_profile.leagues.add(this_league)
+            this_team = Team(
+                user=my_profile,
+                username=my_profile.usrname,
+                league=this_league,
+                league_code=code,
+                team_name=team_name
+            )
+            my_profile.save()
+            this_team.save()
     else:
         form = JoinLeagueForm()
     return render(request, "join_league.html", {"form": form})
