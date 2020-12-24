@@ -6,7 +6,7 @@ class MyAppConfig(AppConfig):
     verbose_name = "My Application"
     def ready(self):
         df = pd.DataFrame(columns=["Name", "Number", "Position", "Height", "Weight", "Age", "Exp", "College"])
-        for thingythings in glob("hello/static/csv/*.csv"):
+        for thingythings in glob("hello/static/csv/teams/*.csv"):
             df2 = pd.read_csv(thingythings)
             df2.columns = ["Name", "Number", "Position", "Height", "Weight", "Age", "Exp", "College"]
             df = df.append(df2)

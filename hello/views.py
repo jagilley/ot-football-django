@@ -194,3 +194,11 @@ def join_league(request):
     else:
         form = JoinLeagueForm()
     return render(request, "join_league.html", {"form": form})
+
+def draft(request, league_code="foobar"):
+    df = pd.read_csv("hello/static/csv/all.csv")
+    return render(request, "draft.html", {
+        "header_bold": "Draft",
+        "table_headers": ["Name", "Number", "Position", "Height", "Weight", "Age", "Exp", "College"],
+        "grid_items": df.to_numpy().tolist()
+    })
