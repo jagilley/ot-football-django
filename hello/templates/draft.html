@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 
 <h2 class="mt-4">{{ header_bold }}</h2>
 <p>{{ header_reg }}</p>
 <p>{{ header_reg2 }}</p>
-
+<!----
 <div class="row mb-4">
     {% for headers_value in table_headers %}
     <div class="col themed-grid-col"><b>{{ headers_value }}</b></div>
@@ -18,5 +19,24 @@
     {% endfor %}
 </div>
 {% endfor %}
+-->
+<link href="{% static 'hello/tabulator-master/dist/css/tabulator.min.css' %}" rel="stylesheet" type="text/css">
+<div>
+    <button id="select-row">Select Row</button>
+    <button id="deselect-row">Deselect Row</button>
+    <button id="select-all">Select All</button>
+    <button id="deselect-all">Deselect All</button>
+
+    <span id="select-stats"></span>
+</div>
+<button type="button" id="myBtn" onclick="draft_a_guy()">Draft heem</button>
+<form action="{% url 'draft_player' %}" method="post"></form>
+        {% csrf_token %}
+        <button type="submit" name='mybtn2' value="hello">Draft 2</button>
+</form>
+<div id="example-table"></div>
+<script type="text/javascript" src="{% static 'hello/tabulator-master/dist/js/tabulator.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'hello/draft.js' %}"></script>
+
 
 {% endblock %}

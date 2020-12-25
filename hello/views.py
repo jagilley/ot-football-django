@@ -11,6 +11,7 @@ import itertools
 from .scores import player_scores_dummy
 import pandas as pd
 from glob import glob
+import json
 from .equiv_pos import equiv_pos
 
 def transpose(a_list):
@@ -199,6 +200,27 @@ def draft(request, league_code="foobar"):
     df = pd.read_csv("hello/static/csv/all.csv")
     return render(request, "draft.html", {
         "header_bold": "Draft",
-        "table_headers": ["Name", "Number", "Position", "Height", "Weight", "Age", "Exp", "College"],
+        "table_headers": df.columns,
         "grid_items": df.to_numpy().tolist()
     })
+
+from django.http import JsonResponse
+
+def get_players(request):
+    df = pd.read_csv("hello/static/csv/all.csv").fillna(0)
+    return JsonResponse(df.to_dict("records"), safe=False)
+
+def draft_player(request):
+    my_user = request.user
+    my_profile = UserProfile.objects.get(usr=my_user)
+    if request.method == 'POST':
+        form = DraftPlayerForm(request.POST)
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        if len(body_data) > 1:
+            raise AssertionError("Can't draft more than 1 guy at a time")
+        print(body_data[0]["Name"])
+        if form.is_valid():
+            print(form.cleaned_data["player_name"])
+            return HttpResponse(status=204)
+        return HttpResponse(status=205)

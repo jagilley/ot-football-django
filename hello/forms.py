@@ -13,6 +13,10 @@ class JoinLeagueForm(forms.Form):
     league_code = forms.CharField(label="League Code", max_length=10)
     team_name = forms.CharField(label="Team Name", max_length=40)
 
+class DraftPlayerForm(forms.Form):
+    player_name = forms.CharField(max_length=60)
+    league_code = forms.CharField(max_length=10)
+
 """
 class LeagueCreation(forms.Form):
     league_name = forms.CharField(label="League Name", max_length=50, default="defaultname")
