@@ -21,19 +21,11 @@
 {% endfor %}
 -->
 <link href="{% static 'hello/tabulator-master/dist/css/tabulator.min.css' %}" rel="stylesheet" type="text/css">
-<div>
-    <button id="select-row">Select Row</button>
-    <button id="deselect-row">Deselect Row</button>
-    <button id="select-all">Select All</button>
-    <button id="deselect-all">Deselect All</button>
-
-    <span id="select-stats"></span>
-</div>
+<script type="text/javascript">
+    var leegcode = "{{ leegcode }}";
+</script>
+<div id="draft-history"></div>
 <button type="button" id="myBtn" onclick="draft_a_guy()">Draft heem</button>
-<form action="{% url 'draft_player' %}" method="post"></form>
-        {% csrf_token %}
-        <button type="submit" name='mybtn2' value="hello">Draft 2</button>
-</form>
 <div id="example-table"></div>
 <script type="text/javascript" src="{% static 'hello/tabulator-master/dist/js/tabulator.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'hello/draft.js' %}"></script>

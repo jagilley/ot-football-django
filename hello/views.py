@@ -201,7 +201,8 @@ def draft(request, league_code="foobar"):
     return render(request, "draft.html", {
         "header_bold": "Draft",
         "table_headers": df.columns,
-        "grid_items": df.to_numpy().tolist()
+        "grid_items": df.to_numpy().tolist(),
+        "leegcode": league_code
     })
 
 from django.http import JsonResponse
@@ -214,13 +215,24 @@ def draft_player(request):
     my_user = request.user
     my_profile = UserProfile.objects.get(usr=my_user)
     if request.method == 'POST':
-        form = DraftPlayerForm(request.POST)
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
         if len(body_data) > 1:
             raise AssertionError("Can't draft more than 1 guy at a time")
-        print(body_data[0]["Name"])
-        if form.is_valid():
-            print(form.cleaned_data["player_name"])
-            return HttpResponse(status=204)
+        player_pos = body_data[0]["Position"]
+        player_name = body_data[0]["Name"]
+        my_team = Team.objects.get(
+            user=my_profile,
+            league_code=request.headers["leaguecode"]
+        )
+        my_team.players[player_pos] = player_name
+        my_team.save()
+        my_league = League.objects.get(league_code=request.headers["leaguecode"])
+        my_league.draft_history.append(f"{my_user.username} has drafted {player_pos} {player_name} to {my_team.team_name}")
+        my_league.save()
         return HttpResponse(status=205)
+
+def draft_history(request, league_code="foobar"):
+    this_league = League.objects.get(league_code=league_code)
+    df = pd.DataFrame(this_league.draft_history, columns=["Draft History"])
+    return JsonResponse(df.to_dict("records"), safe=False)

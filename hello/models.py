@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 import json
 
+def def_json():
+    return []
+
 # Create your models here.
 class Greeting(models.Model):
     when = models.DateTimeField("date created", auto_now_add=True)
@@ -12,6 +15,7 @@ class League(models.Model):
     publicly_joinable = models.BooleanField(default=False)
     #creator = models.ForeignKey(User, on_delete=models.CASCADE)
     already_drafted = models.BooleanField(default=False)
+    draft_history = models.JSONField(default=def_json)
 
 #default_league = League()
 #default_league.save()

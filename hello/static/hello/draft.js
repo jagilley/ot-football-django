@@ -15,10 +15,18 @@ var table = new Tabulator("#example-table", {
     rowClick:function(e, row){ //trigger an alert message when the row is clicked
         alert("Row " + row.getIndex() + " Clicked!!!!");
     },*/
+    /*
     rowSelectionChanged:function(data, rows){
         //update selected row counter on selection change
     	document.getElementById("select-stats").innerHTML = data.length;
-    },
+    },*/
+});
+console.log(leegcode);
+var draftHistory = new Tabulator("#draft-history", {
+    height:200,
+    ajaxURL: ("../../../" + "league/" + leegcode + "/draft/history"),
+    layout:"fitColumns",
+    autoColumns:true
 });
 
 function getCookie(name) {
@@ -42,7 +50,6 @@ function draft_a_guy() {
     var x = document.getElementById("myBtn");
     x.disabled = true;
     var selectedRows = table.getSelectedData();
-    console.log(selectedRows);
     // You REALLY want shouldBeAsync = true.
     // Otherwise, it'll block ALL execution waiting for server response.
     var shouldBeAsync = true;
@@ -71,9 +78,11 @@ function draft_a_guy() {
 
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.setRequestHeader('X-CSRFToken', csrftoken);
-    // Or... request.setRequestHeader("Content-Type", "text/plain;charset=UTF-8");
-    // Or... whatever
-
+    request.setRequestHeader("leaguecode", leegcode);
+    //compositeJson = selectedRows + JSON.parse(('{' + leegcode + '}'));
     // Actually sends the request to the server.
     request.send(JSON.stringify(selectedRows));
   }
+
+setInterval(function(){table.replaceData();}, 3000);
+setInterval(function(){draftHistory.replaceData();}, 3000);
