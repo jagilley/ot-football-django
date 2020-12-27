@@ -13,7 +13,7 @@ import pandas as pd
 from glob import glob
 import json
 from .equiv_pos import equiv_pos
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def transpose(a_list):
     return list(map(list, itertools.zip_longest(*a_list, fillvalue=None)))
@@ -248,6 +248,7 @@ def draft_player(request):
         )
         my_team.players[player_pos] = player_name
         my_team.save()
+        # Draft management
         my_league.draft_history.append(f"{my_user.username} has drafted {player_pos} {player_name} to {my_team.team_name}")
         do_list = my_league.draft_order_list
         cdlist = do_list.pop(0)
@@ -256,6 +257,16 @@ def draft_player(request):
         my_league.draft_started_at = datetime.now(tz=timezone('US/Eastern'))
         my_league.save()
         return HttpResponse(status=205)
+
+def draft_timeout(league_code="foobar", usrname="usrname"):
+    my_league = League.objects.get(league_code=league_code)
+    my_league.draft_history.append(f"{usrname}'s draft slot timed out, going to next player")
+    do_list = my_league.draft_order_list
+    do_list.append(do_list.pop(0))
+    my_league.drafting_player_un = do_list[0]
+    my_league.draft_started_at = datetime.now(tz=timezone('US/Eastern'))
+    my_league.save()
+    return HttpResponse(status=205)
 
 def draft_history(request, league_code="foobar"):
     this_league = League.objects.get(league_code=league_code)
@@ -268,6 +279,8 @@ def draft_info(request):
     eastern = timezone('US/Eastern')
     now = datetime.now(tz=eastern)
     delta = now - start_time
+    if delta > timedelta(minutes=2):
+        draft_timeout(league_code=request.headers["leaguecode"], usrname=request.user.username)
     deltastr = str(delta).split(".")[0][3:]
     #delta_str = delta.strftime('%M:%S')
     return JsonResponse({
