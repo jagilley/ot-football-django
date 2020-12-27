@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import json
+from datetime import datetime
 
 def def_json():
     return []
@@ -16,6 +17,10 @@ class League(models.Model):
     #creator = models.ForeignKey(User, on_delete=models.CASCADE)
     already_drafted = models.BooleanField(default=False)
     draft_history = models.JSONField(default=def_json)
+    draft_started_at = models.DateTimeField(default=datetime.now, blank=True)
+    draft_order = models.CharField(max_length=1000, default="")
+    draft_order_list = models.JSONField(default=def_json)
+    drafting_player_un = models.CharField(max_length=30, default="")
 
 #default_league = League()
 #default_league.save()

@@ -25,6 +25,7 @@ urlpatterns = [
     path("league/<slug:league_code>/", hello.views.league_page, name="leaguepage"),
     path("league/<slug:league_code>/draft/", hello.views.draft, name="draft"),
     path("league/<slug:league_code>/draft/history", hello.views.draft_history, name="draft_history"),
+    path("draft_info/", hello.views.draft_info, name="draft_info"),
     path("get_players/", hello.views.get_players, name="get_players"),
     path("draft_player/", hello.views.draft_player, name="draft_player"),
     path("signup/", hello.views.signup, name="signup"),

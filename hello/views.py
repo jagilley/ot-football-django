@@ -13,6 +13,7 @@ import pandas as pd
 from glob import glob
 import json
 from .equiv_pos import equiv_pos
+from datetime import datetime
 
 def transpose(a_list):
     return list(map(list, itertools.zip_longest(*a_list, fillvalue=None)))
@@ -196,10 +197,27 @@ def join_league(request):
         form = JoinLeagueForm()
     return render(request, "join_league.html", {"form": form})
 
+from pytz import timezone
+
 def draft(request, league_code="foobar"):
     df = pd.read_csv("hello/static/csv/all.csv")
+
+    # ALERT - this should be removed
+    my_league = League.objects.get(league_code=league_code)
+    eastern = timezone('US/Eastern')
+    my_league.draft_started_at = datetime.now(tz=eastern)
+
+    league_participants = [team.username for team in Team.objects.filter(league_code=league_code)]
+    random.shuffle(league_participants)
+    #my_league.draft_order = " ".join(league_participants)
+    my_league.draft_order_list = league_participants
+    my_league.drafting_player_un = league_participants[0]
+
+    my_league.save()
+
     return render(request, "draft.html", {
         "header_bold": "Draft",
+        "header_reg": f"Started at {my_league.draft_started_at.strftime('%m/%d/%Y, %H:%M:%S')}",
         "table_headers": df.columns,
         "grid_items": df.to_numpy().tolist(),
         "leegcode": league_code
@@ -217,8 +235,11 @@ def draft_player(request):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
+        my_league = League.objects.get(league_code=request.headers["leaguecode"])
         if len(body_data) > 1:
             raise AssertionError("Can't draft more than 1 guy at a time")
+        if my_user.username != my_league.drafting_player_un:
+            raise AssertionError("Hey, you're not supposed to draft, asshole!")
         player_pos = body_data[0]["Position"]
         player_name = body_data[0]["Name"]
         my_team = Team.objects.get(
@@ -227,8 +248,12 @@ def draft_player(request):
         )
         my_team.players[player_pos] = player_name
         my_team.save()
-        my_league = League.objects.get(league_code=request.headers["leaguecode"])
         my_league.draft_history.append(f"{my_user.username} has drafted {player_pos} {player_name} to {my_team.team_name}")
+        do_list = my_league.draft_order_list
+        cdlist = do_list.pop(0)
+        do_list.append(cdlist)
+        my_league.drafting_player_un = do_list[0]
+        my_league.draft_started_at = datetime.now(tz=timezone('US/Eastern'))
         my_league.save()
         return HttpResponse(status=205)
 
@@ -236,3 +261,16 @@ def draft_history(request, league_code="foobar"):
     this_league = League.objects.get(league_code=league_code)
     df = pd.DataFrame(this_league.draft_history, columns=["Draft History"])
     return JsonResponse(df.to_dict("records"), safe=False)
+
+def draft_info(request):
+    this_league = League.objects.get(league_code=request.headers["leaguecode"])
+    start_time = this_league.draft_started_at
+    eastern = timezone('US/Eastern')
+    now = datetime.now(tz=eastern)
+    delta = now - start_time
+    deltastr = str(delta).split(".")[0][3:]
+    #delta_str = delta.strftime('%M:%S')
+    return JsonResponse({
+        "draft_time": deltastr,
+        "drafter": this_league.draft_order_list[0]
+    }, safe=False)
