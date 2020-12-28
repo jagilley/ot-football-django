@@ -64,12 +64,30 @@ def get_name(request):
 
 def create_league(request):
     if request.method == "POST":
+        my_user = request.user
         random_4_code = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
         form = LeagueModelForm(request.POST)
         if form.is_valid():
             new_league = form.save(commit=False)
             new_league.league_code = random_4_code
+            new_league.creator = my_user
             new_league.save()
+
+            # add user to league automatically
+
+            my_profile = UserProfile.objects.get(usr=my_user)
+            this_league = League.objects.get(league_code=random_4_code)
+            my_profile.leagues.add(this_league)
+            this_team = Team(
+                user=my_profile,
+                username=my_profile.usrname,
+                league=this_league,
+                league_code=random_4_code,
+                team_name=f"{this_league.league_name} Commissioner"
+            )
+            my_profile.save()
+            this_team.save()
+            return HttpResponseRedirect(f"/league/{random_4_code}")
     else:
         form = LeagueModelForm()
     return render(request, 'create_league.html', {'form': form})
@@ -88,7 +106,8 @@ def league_page(request, league_code="foobar"):
         "header_reg2": "League members: " + ", ".join(league_usrnames),
         "table_headers": ["Username", "Team Name", "Record", "Total Points", "Team Page"],
         "grid_items": league_standings,
-        "leegcode": my_league.league_code
+        "leegcode": my_league.league_code,
+        "this_league": my_league
     })
 
 def team_page(request, league_code="foobar", username="fobr"):
@@ -193,6 +212,7 @@ def join_league(request):
             )
             my_profile.save()
             this_team.save()
+            return HttpResponseRedirect(f"/league/{code}")
     else:
         form = JoinLeagueForm()
     return render(request, "join_league.html", {"form": form})
@@ -218,6 +238,7 @@ def draft(request, league_code="foobar"):
     return render(request, "draft.html", {
         "header_bold": "Draft",
         "header_reg": f"Started at {my_league.draft_started_at.strftime('%m/%d/%Y, %H:%M:%S')}",
+        "header_reg2": f"Draft order is: {', '.join(my_league.draft_order_list)}",
         "table_headers": df.columns,
         "grid_items": df.to_numpy().tolist(),
         "leegcode": league_code
@@ -282,7 +303,6 @@ def draft_info(request):
     if delta > timedelta(minutes=2):
         draft_timeout(league_code=request.headers["leaguecode"], usrname=request.user.username)
     deltastr = str(delta).split(".")[0][3:]
-    #delta_str = delta.strftime('%M:%S')
     return JsonResponse({
         "draft_time": deltastr,
         "drafter": this_league.draft_order_list[0]

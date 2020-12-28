@@ -72,7 +72,7 @@ function update_header(){
     var request = new XMLHttpRequest();
     request.onload = function () {
         var status = request.status;
-        var data = request.responseText; // Returned data, e.g., an HTML document.
+        var data = request.responseText;
         var json_data = JSON.parse(data);
         draftHeader.innerHTML = (json_data["drafter"] + " has been drafting for " + json_data["draft_time"]);
     }

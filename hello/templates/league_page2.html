@@ -1,4 +1,9 @@
 {% extends 'league_page.html' %}
+{% block start_draft_button %}
+{% if not this_league.already_drafted and user == this_league.creator %}
+<a href="./draft">Start draft.</a> (This will lock in the league members shown below and prevent further members from being added.)
+{% endif %}
+{% endblock %}
 {% block extra_col %}
 <div class="col themed-grid-col"><a href="{% url 'team_page' league_code=leegcode  username=item.0 %}">Team page</a></div>
 {% endblock %}

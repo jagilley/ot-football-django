@@ -6,6 +6,10 @@ from datetime import datetime
 def def_json():
     return []
 
+def def_user():
+    return User.objects.get(username="defaultuser")
+    #return User.objects.create_user("defaultuser")
+
 # Create your models here.
 class Greeting(models.Model):
     when = models.DateTimeField("date created", auto_now_add=True)
@@ -14,7 +18,7 @@ class League(models.Model):
     league_name = models.CharField(default="defaultname", max_length=50)
     league_code = models.CharField(default="0000", max_length=10)
     publicly_joinable = models.BooleanField(default=False)
-    #creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, default=def_user)
     already_drafted = models.BooleanField(default=False)
     draft_history = models.JSONField(default=def_json)
     draft_started_at = models.DateTimeField(default=datetime.now, blank=True)
