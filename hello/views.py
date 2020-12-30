@@ -66,6 +66,11 @@ def get_name(request):
 def create_league(request):
     if request.method == "POST":
         my_user = request.user
+        try:
+            defuser = User.objects.create_user("defaultuser")
+            defuser.save()
+        except:
+            pass
         random_4_code = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
         form = LeagueModelForm(request.POST)
         if form.is_valid():
