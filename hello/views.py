@@ -14,6 +14,7 @@ from glob import glob
 import json
 from .equiv_pos import equiv_pos
 from datetime import datetime, timedelta
+import copy
 
 def transpose(a_list):
     return list(map(list, itertools.zip_longest(*a_list, fillvalue=None)))
@@ -83,7 +84,18 @@ def create_league(request):
                 username=my_profile.usrname,
                 league=this_league,
                 league_code=random_4_code,
-                team_name=f"{this_league.league_name} Commissioner"
+                #team_name=f"{this_league.league_name} Commissioner"
+                team_name=random.choice([
+                    "Supreme Leader",
+                    "Head Honcho",
+                    "Eternal Commissioner",
+                    "Benevolent Dictator For Life",
+                    "His/Her/Their Excellency",
+                    "El Generalissimo",
+                    "Chief Minister of Football",
+                    "5 Star General Manager",
+                    "Goodell's Second Coming"
+                ])
             )
             my_profile.save()
             this_team.save()
@@ -103,11 +115,22 @@ def league_page(request, league_code="foobar"):
     return render(request, "league_page2.html", {
         "header_bold": f"{my_league.league_name} - League Standings",
         "header_reg": (f"League code {my_league.league_code}, ") + ("publicly joinable, " if my_league.publicly_joinable else "not publicly joinable, ") + "draft has " + ("already" if my_league.already_drafted else "not") + " taken place.",
-        "header_reg2": "League members: " + ", ".join(league_usrnames),
-        "table_headers": ["Username", "Team Name", "Record", "Total Points", "Team Page"],
+        "header_reg2": "League members: " + ", ".join(league_usrnames) + ".",
+        "table_headers": ["Username", "Team Name", "Record", "Total Points", "Team Page", "Matchup Page"],
         "grid_items": league_standings,
         "leegcode": my_league.league_code,
-        "this_league": my_league
+        "this_league": my_league,
+        "league_member_count": len(UserProfiles)
+    })
+
+def league_matchups(request, league_code="foobar"):
+    try:
+        my_league = League.objects.get(league_code=league_code)
+    except IndexError:
+        raise AssertionError("League code not found")
+    return render(request, "league_page.html", {
+        "header_bold": f"{my_league.league_name} - League Matchups",
+        "grid_items": list(my_league.matchups.values())
     })
 
 def team_page(request, league_code="foobar", username="fobr"):
@@ -118,23 +141,23 @@ def team_page(request, league_code="foobar", username="fobr"):
     except:
         #raise AssertionError("Team with this league code / user not found")
         my_team = Team(
-            team_name="Fighting 4 Percent Mexicans",
+            team_name="Auto-created team",
             user=my_profile,
             league=League.objects.get(league_code=league_code)
         )
-    
-    df = pd.read_csv("hello/static/csv/all.csv")
-    for k,v in my_team.players.items():
-        try:
-            my_team.players.update({
-                k: random.choice(
-                    df[(df["Position"].isin(equiv_pos[k]))]["Name"].tolist()
-                )
-            })
-        except KeyError:
-            print(k, equiv_pos[k])
-        except IndexError:
-            pass
+    if my_team.players["QB"] == "" and my_team.players["RB1"] == "" and my_team.players["WR1"] == "":
+        df = pd.read_csv("hello/static/csv/all.csv")
+        for k,v in my_team.players.items():
+            try:
+                my_team.players.update({
+                    k: random.choice(
+                        df[(df["Position"].isin(equiv_pos[k]))]["Name"].tolist()
+                    )
+                })
+            except KeyError:
+                print(k, equiv_pos[k])
+            except IndexError:
+                pass
 
     round_number = 1
     players_list = [[k, v, player_scores_dummy(v, round_number)] for k,v in my_team.players.items()]
@@ -144,12 +167,46 @@ def team_page(request, league_code="foobar", username="fobr"):
         "grid_items": players_list
     })
 
+def matchup(request, league_code="foobar", username="foobar", week=1):
+    my_user = request.user
+    my_profile = UserProfile.objects.get(usr=my_user)
+    try:
+        my_team = Team.objects.get(league_code=league_code, username=username)
+    except:
+        #raise AssertionError("Team with this league code / user not found")
+        my_team = Team(
+            team_name="Auto-created team",
+            user=my_profile,
+            league=League.objects.get(league_code=league_code)
+        )
+    
+    if my_team.players["QB"] == "" and my_team.players["RB1"] == "" and my_team.players["WR1"] == "":
+        df = pd.read_csv("hello/static/csv/all.csv")
+        for k,v in my_team.players.items():
+            try:
+                my_team.players.update({
+                    k: random.choice(
+                        df[(df["Position"].isin(equiv_pos[k]))]["Name"].tolist()
+                    )
+                })
+            except KeyError:
+                print(k, equiv_pos[k])
+            except IndexError:
+                pass
+
+    round_number = 1
+    players_list = [[k, v, player_scores_dummy(v, round_number)] for k,v in my_team.players.items()]
+    return render(request, "matchup.html", {
+        "header_bold": (my_team.team_name + f" - Matchup Week {week}"),
+        "grid_items": players_list
+    })
+
 def public_leagues(request):
     all_public_leagues = League.objects.filter(publicly_joinable=True)
     data = [[leeg.league_name, leeg.league_code] for leeg in all_public_leagues]
     return render(request, "league_page.html", {
         "header_bold": "All Public Leagues",
-        "header_reg": "",
+        "header_reg": "Sign up to join",
         "table_headers": ["League Name", "League Code"],
         "grid_items": data
     })
@@ -222,17 +279,75 @@ from pytz import timezone
 def draft(request, league_code="foobar"):
     df = pd.read_csv("hello/static/csv/all.csv")
 
-    # ALERT - this should be removed
+    # ALERT - this should be removed (?)
     my_league = League.objects.get(league_code=league_code)
     eastern = timezone('US/Eastern')
     my_league.draft_started_at = datetime.now(tz=eastern)
 
+    my_league.matchups = {}
     league_participants = [team.username for team in Team.objects.filter(league_code=league_code)]
     random.shuffle(league_participants)
     #my_league.draft_order = " ".join(league_participants)
     my_league.draft_order_list = league_participants
     my_league.drafting_player_un = league_participants[0]
+    """
+    for i in range(1,4):
+        for player in league_participants:
+            my_league.matchups[f"week{i}"][player] = """
+    for i in range(1,4):
+        my_league.matchups[f"week{i}"] = {}
+        already_scheduled = []
+        for player in league_participants:
+            if player in already_scheduled:
+                #print("skipping", player, "already scheduled")
+                continue
+            non_player = copy.deepcopy(league_participants)
+            non_player.remove(player)
+            if i == 2:
+                last_week_opp = my_league.matchups["week1"][player]
+                if last_week_opp in non_player:
+                    non_player.remove(last_week_opp)
+            if i == 3:
+                last_week_opp1 = my_league.matchups["week1"][player]
+                last_week_opp2 = my_league.matchups["week2"][player]
+                if last_week_opp1 in non_player:
+                    non_player.remove(last_week_opp1)
+                if last_week_opp2 in non_player:
+                    non_player.remove(last_week_opp2)
+            non_player = [j for j in non_player if j not in already_scheduled]
 
+            my_opponent = random.choice(non_player)
+            my_league.matchups[f"week{i}"][player] = my_opponent
+            my_league.matchups[f"week{i}"][my_opponent] = player
+            #print("week", i, "-", player, "playing", my_opponent)
+            already_scheduled.append(player)
+            already_scheduled.append(my_opponent)
+            #print("already sch is", already_scheduled)
+    """
+    # the 1 seed always plays the 234 seeds
+    for i in range(1,4):
+        my_league.matchups["week"][league_participants[0]] = league_participants[i]
+    
+    for nth_participant in league_participants[1:]:
+        for i in range(1,4):
+            week_matchups = []
+            index_adjust = i - 1
+            pcpt_cnt = len(league_participants)
+            
+            for iter_count, participant in enumerate(league_participants):
+                week_matchups.append(
+                    [league_participants[(iter_count + index_adjust) % pcpt_cnt], league_participants[(iter_count + 1 + index_adjust) % pcpt_cnt]]
+                )
+            
+            my_league.matchups[][nth_participant]
+            
+            for pcpt1 in league_participants:
+                for pcpt2 in league_participants:
+                    if pcpt1 != pcpt2:
+                        week_matchups.append([pcpt1, pcpt2])
+            
+        my_league.matchups["week"] = week_matchups
+    """
     my_league.save()
 
     return render(request, "draft.html", {

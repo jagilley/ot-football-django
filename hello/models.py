@@ -6,6 +6,9 @@ from datetime import datetime
 def def_json():
     return []
 
+def def_json_dict():
+    return {}
+
 def def_user():
     return User.objects.get(username="defaultuser")
     #return User.objects.create_user("defaultuser")
@@ -25,6 +28,7 @@ class League(models.Model):
     draft_order = models.CharField(max_length=1000, default="")
     draft_order_list = models.JSONField(default=def_json)
     drafting_player_un = models.CharField(max_length=30, default="")
+    matchups = models.JSONField(default=def_json_dict)
 
 #default_league = League()
 #default_league.save()

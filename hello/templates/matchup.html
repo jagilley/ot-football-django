@@ -5,7 +5,9 @@
 
     <h2 class="mt-4">{{ header_bold }}</h2>
     <p>{{ header_reg }} {% block start_draft_button %}{% endblock %}</p>
-    <p>{{ header_reg2 }} {% block matchups_button %}{% endblock %}</p>
+    <p>{{ header_reg2 }}</p>
+
+    <div class="container">
 
     <div class="row mb-4">
         {% for headers_value in table_headers %}
@@ -18,9 +20,13 @@
         {% for item_value in item %}
         <div class="col themed-grid-col">{{ item_value }}</div>
         {% endfor %}
-        {% block extra_col %}{% endblock %}
+        <div class="col"></div>
+        {% for item_value in item %}
+        <div class="col themed-grid-col">{{ item_value }}</div>
+        {% endfor %}
     </div>
     {% endfor %}
+</div>
 
 
     

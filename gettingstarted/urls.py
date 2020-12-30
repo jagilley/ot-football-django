@@ -32,7 +32,9 @@ urlpatterns = [
     path("public/", hello.views.public_leagues, name="public"),
     path("join_league/", hello.views.join_league, name="join_league"),
     path("my_leagues/", hello.views.my_leagues, name="my_leagues"),
-    path("league/<slug:league_code>/team/<slug:username>/", hello.views.team_page, name="team_page")
+    path("league/<slug:league_code>/team/<slug:username>/", hello.views.team_page, name="team_page"),
+    path("league/<slug:league_code>/matchup/<slug:username>/<int:week>/", hello.views.matchup, name="matchup"),
+    path("league/<slug:league_code>/matchups/", hello.views.league_matchups, name="matchups")
 ]
 """
     ^ this includes:

@@ -1,9 +1,23 @@
 {% extends 'league_page.html' %}
 {% block start_draft_button %}
-{% if not this_league.already_drafted and user == this_league.creator %}
+{% if not this_league.already_drafted %}
+{% if league_member_count > 3 %}
+{% if user == this_league.creator %}
 <a href="./draft">Start draft.</a> (This will lock in the league members shown below and prevent further members from being added.)
+{% else %}
+You don't appear to be signed in as the league commissioner, please tell your league commissioner to start the draft.
+{% endif %}
+{% else %}
+You need at least 4 players in this league to start the draft.
+{% endif %}
+{% endif %}
+{% endblock %}
+{% block matchups_button %}
+{% if this_league.already_drafted %}
+<a href="{% url 'matchups' league_code=leegcode %}">View matchups for league.</a>
 {% endif %}
 {% endblock %}
 {% block extra_col %}
 <div class="col themed-grid-col"><a href="{% url 'team_page' league_code=leegcode  username=item.0 %}">Team page</a></div>
+<div class="col themed-grid-col"><a href="{% url 'matchup' league_code=leegcode  username=item.0 week=1 %}">Team page</a></div>
 {% endblock %}
