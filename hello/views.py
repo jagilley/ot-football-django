@@ -19,6 +19,9 @@ import copy
 def transpose(a_list):
     return list(map(list, itertools.zip_longest(*a_list, fillvalue=None)))
 
+def faq(request):
+    return render(request, "faq.html")
+
 # Create your views here.
 def index(request):
     return render(request, "cover.html")
@@ -31,7 +34,7 @@ def grid(request):
     return render(request, "grid.html", {"scores": scores, "total": total, "name": my_name})
 
 def leaderboard(request):
-    userz = UserExt.objects.all()
+    userz = UserProfile.objects.all()
     return render(request, "users.html", {"leader_users": userz})
 
 def get_name(request):
@@ -209,11 +212,11 @@ def matchup(request, league_code="foobar", username="foobar", week=1):
 
 def public_leagues(request):
     all_public_leagues = League.objects.filter(publicly_joinable=True)
-    data = [[leeg.league_name, leeg.league_code] for leeg in all_public_leagues]
+    data = [[leeg.league_name, leeg.creator.username, leeg.league_code] for leeg in all_public_leagues]
     return render(request, "league_page.html", {
         "header_bold": "All Public Leagues",
-        "header_reg": "Sign up to join",
-        "table_headers": ["League Name", "League Code"],
+        "header_reg": "Sign up to join, then input the desired league code on the Join League page.",
+        "table_headers": ["League Name", "League Creator", "League Code"],
         "grid_items": data
     })
 

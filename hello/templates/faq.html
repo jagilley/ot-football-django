@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <h2 class="mt-4">FAQ</h2>
+    <p>{{ header_reg }}</p>
+    <p>{{ header_reg2 }}</p>
+
+    <p>
+        <b>How does Playoff Fantasy Football differ from regular Fantasy Football?</b>
+    </p>
+    <p>
+        The drafting processes, scoring methods, etc., are all identical to what you'll be
+        familiar with from regular fantasy football. The meta is a bit different, though.
+        While, for instance, it can be useful to draft good players on bad teams in regular
+        fantasy, this strategy may be less useful in playoff fantasy because those bad teams
+        may be more likely to be eliminated quickly (leaving their players
+        unable to score any more points.) Drafting mediocre players on good teams may therefore
+        be much more useful in playoff fantasy than in regular fantasy.
+    </p>
+    <p>
+        <b>How many people can be in an Overtime Football league?</b>
+    </p>
+    <p>
+        Because each player must play 3 other players before the Fantasy Super Bowl, each league must
+        have a minimum of 4 players. You'll need to have this quorum before starting the fantasy draft.
+        There is no upper limit on the number of players in a league, but at some point, you'll run out of starting QBs
+        (for instance), and it will become hard to maintain league parity, so we wouldn't recommend having too many more
+        than, say, 8 players in a league.
+    </p>
+    <p>
+        <b>How does the playoff elimination process work?</b>
+    </p>
+    <p>
+        We use a condensed version of the regular fantasy tournament method (known in the field of tournament design
+        as a Swiss tournament.) Each player plays 3 other players during the first 3 weeks of the NFL playoffs. At the
+        conclusion of this round, the top two players by record (and secondarily, total points scored) advance to the Fantasy
+        Super Bowl. The winner of the Fantasy Super Bowl wins the league.
+    </p>
+    <p>
+        <b>What scoring format do you use?</b>
+    </p>
+    <p>
+        We use <a href="https://fantasysixpack.net/fantasy-football-standard-ppr-half-ppr/">half-PPR</a>
+        because we think standard is too biased towards touchdowns, and full PPR is too biased towards
+        (potentially relatively meaningless) receptions. In the playoffs, finding the right balance between these
+        is especially important.
+    </p>
+    <p>
+        <b>Can I use other scoring formats?</b>
+    </p>
+    <p>
+        Not right now, but this is feature is on the to-do list.
+    </p>
+    <p>
+        <b>Can the league creator (aka 'commissioner', 'admin') have a custom team name?</b>
+    </p>
+    <p>
+        This isn't possible at the moment, for database design reasons. Instead, league creators
+        get a randomly-assigned tongue-in-cheek immutable title.
+    </p>
+
+{% endblock %}
