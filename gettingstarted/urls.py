@@ -35,7 +35,8 @@ urlpatterns = [
     path("league/<slug:league_code>/team/<slug:username>/", hello.views.team_page, name="team_page"),
     path("league/<slug:league_code>/matchup/<slug:username>/<int:week>/", hello.views.matchup, name="matchup"),
     path("league/<slug:league_code>/matchups/", hello.views.league_matchups, name="matchups"),
-    path("faq/", hello.views.faq, name="faq")
+    path("faq/", hello.views.faq, name="faq"),
+    path("contact/", hello.views.contact, name="contact")
 ]
 """
     ^ this includes:

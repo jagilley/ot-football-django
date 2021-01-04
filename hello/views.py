@@ -22,7 +22,9 @@ def transpose(a_list):
 def faq(request):
     return render(request, "faq.html")
 
-# Create your views here.
+def contact(request):
+    return render(request, "contact.html")
+
 def index(request):
     return render(request, "cover.html")
 
@@ -266,6 +268,8 @@ def join_league(request):
             code = form.cleaned_data['league_code']
             team_name = form.cleaned_data["team_name"]
             this_league = League.objects.get(league_code=code)
+            if this_league.already_drafted:
+                raise AssertionError("This league already drafted, unjoinable!")
             #user_obj = User.objects.get(username=username)
             #profile = UserProfile.objects.get(usr=user_obj)
             my_profile.leagues.add(this_league)
@@ -296,6 +300,7 @@ def draft(request, league_code="foobar"):
     my_league.matchups = {}
     league_participants = [team.username for team in Team.objects.filter(league_code=league_code)]
     random.shuffle(league_participants)
+    my_league.already_drafted = True
     #my_league.draft_order = " ".join(league_participants)
     my_league.draft_order_list = league_participants
     my_league.drafting_player_un = league_participants[0]
