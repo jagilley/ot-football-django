@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h2 class="mt-4">{{ header_bold }}</h2>
+    <p>{{ header_reg }}</p>
+    <p>{{ header_reg2 }}</p>
+
+    {% for item in grid_items %}
+    <h3>{{ three }}</h3>
+    <div class="row mb-4">
+        {% for item_value in item %}
+        <div class="col themed-grid-col">{{ item_value }}</div>
+        {% endfor %}
+        {% block extra_col %}{% endblock %}
+    </div>
+    {% endfor %}
+
+
+
+    
+</main>
+{% endblock %}

@@ -48,7 +48,7 @@ const csrftoken = getCookie('csrftoken');
 
 function draft_a_guy() {
     var x = document.getElementById("myBtn");
-    x.disabled = true;
+    //x.disabled = true;
     var selectedRows = table.getSelectedData();
     var shouldBeAsync = true;
 

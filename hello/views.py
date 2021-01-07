@@ -139,9 +139,10 @@ def league_matchups(request, league_code="foobar"):
         my_league = League.objects.get(league_code=league_code)
     except IndexError:
         raise AssertionError("League code not found")
-    return render(request, "league_page.html", {
+    return render(request, "league_matchups.html", {
         "header_bold": f"{my_league.league_name} - League Matchups",
-        "grid_items": list(my_league.matchups.values())
+        "grid_items": list(my_league.matchups.values()),
+        "three": list(range(1,4))
     })
 
 def team_page(request, league_code="foobar", username="fobr"):
@@ -291,78 +292,76 @@ from pytz import timezone
 
 def draft(request, league_code="foobar"):
     df = pd.read_csv("hello/static/csv/all.csv")
-
-    # ALERT - this should be removed (?)
     my_league = League.objects.get(league_code=league_code)
-    eastern = timezone('US/Eastern')
-    my_league.draft_started_at = datetime.now(tz=eastern)
+    if request.user == my_league.creator and my_league.matchups == {}:
+        # ALERT - this should be removed (?)
+        
+        eastern = timezone('US/Eastern')
+        my_league.draft_started_at = datetime.now(tz=eastern)
 
-    my_league.matchups = {}
-    league_participants = [team.username for team in Team.objects.filter(league_code=league_code)]
-    random.shuffle(league_participants)
-    my_league.already_drafted = True
-    #my_league.draft_order = " ".join(league_participants)
-    my_league.draft_order_list = league_participants
-    my_league.drafting_player_un = league_participants[0]
-    """
-    for i in range(1,4):
-        for player in league_participants:
-            my_league.matchups[f"week{i}"][player] = """
-    for i in range(1,4):
-        my_league.matchups[f"week{i}"] = {}
-        already_scheduled = []
-        for player in league_participants:
-            if player in already_scheduled:
-                #print("skipping", player, "already scheduled")
-                continue
-            non_player = copy.deepcopy(league_participants)
-            non_player.remove(player)
-            if i == 2:
-                last_week_opp = my_league.matchups["week1"][player]
-                if last_week_opp in non_player:
-                    non_player.remove(last_week_opp)
-            if i == 3:
-                last_week_opp1 = my_league.matchups["week1"][player]
-                last_week_opp2 = my_league.matchups["week2"][player]
-                if last_week_opp1 in non_player:
-                    non_player.remove(last_week_opp1)
-                if last_week_opp2 in non_player:
-                    non_player.remove(last_week_opp2)
-            non_player = [j for j in non_player if j not in already_scheduled]
+        my_league.matchups = {}
+        league_participants = [team.username for team in Team.objects.filter(league_code=league_code)]
+        random.shuffle(league_participants)
+        #my_league.already_drafted = True
 
-            my_opponent = random.choice(non_player)
-            my_league.matchups[f"week{i}"][player] = my_opponent
-            my_league.matchups[f"week{i}"][my_opponent] = player
-            #print("week", i, "-", player, "playing", my_opponent)
-            already_scheduled.append(player)
-            already_scheduled.append(my_opponent)
-            #print("already sch is", already_scheduled)
-    """
-    # the 1 seed always plays the 234 seeds
-    for i in range(1,4):
-        my_league.matchups["week"][league_participants[0]] = league_participants[i]
-    
-    for nth_participant in league_participants[1:]:
+        my_league.draft_order_list = league_participants
+        my_league.drafting_player_un = league_participants[0]
+
         for i in range(1,4):
-            week_matchups = []
-            index_adjust = i - 1
-            pcpt_cnt = len(league_participants)
-            
-            for iter_count, participant in enumerate(league_participants):
-                week_matchups.append(
-                    [league_participants[(iter_count + index_adjust) % pcpt_cnt], league_participants[(iter_count + 1 + index_adjust) % pcpt_cnt]]
-                )
-            
-            my_league.matchups[][nth_participant]
-            
-            for pcpt1 in league_participants:
-                for pcpt2 in league_participants:
-                    if pcpt1 != pcpt2:
-                        week_matchups.append([pcpt1, pcpt2])
-            
-        my_league.matchups["week"] = week_matchups
-    """
-    my_league.save()
+            my_league.matchups[f"week{i}"] = {}
+            already_scheduled = []
+            for player in league_participants:
+                if player in already_scheduled:
+                    #print("skipping", player, "already scheduled")
+                    continue
+                non_player = copy.deepcopy(league_participants)
+                non_player.remove(player)
+                if i == 2:
+                    last_week_opp = my_league.matchups["week1"][player]
+                    if last_week_opp in non_player:
+                        non_player.remove(last_week_opp)
+                if i == 3:
+                    last_week_opp1 = my_league.matchups["week1"][player]
+                    last_week_opp2 = my_league.matchups["week2"][player]
+                    if last_week_opp1 in non_player:
+                        non_player.remove(last_week_opp1)
+                    if last_week_opp2 in non_player:
+                        non_player.remove(last_week_opp2)
+                non_player = [j for j in non_player if j not in already_scheduled]
+
+                my_opponent = random.choice(non_player)
+                my_league.matchups[f"week{i}"][player] = my_opponent
+                my_league.matchups[f"week{i}"][my_opponent] = player
+                #print("week", i, "-", player, "playing", my_opponent)
+                already_scheduled.append(player)
+                already_scheduled.append(my_opponent)
+                #print("already sch is", already_scheduled)
+        """
+        # the 1 seed always plays the 234 seeds
+        for i in range(1,4):
+            my_league.matchups["week"][league_participants[0]] = league_participants[i]
+        
+        for nth_participant in league_participants[1:]:
+            for i in range(1,4):
+                week_matchups = []
+                index_adjust = i - 1
+                pcpt_cnt = len(league_participants)
+                
+                for iter_count, participant in enumerate(league_participants):
+                    week_matchups.append(
+                        [league_participants[(iter_count + index_adjust) % pcpt_cnt], league_participants[(iter_count + 1 + index_adjust) % pcpt_cnt]]
+                    )
+                
+                my_league.matchups[][nth_participant]
+                
+                for pcpt1 in league_participants:
+                    for pcpt2 in league_participants:
+                        if pcpt1 != pcpt2:
+                            week_matchups.append([pcpt1, pcpt2])
+                
+            my_league.matchups["week"] = week_matchups
+        """
+        my_league.save()
 
     return render(request, "draft.html", {
         "header_bold": "Draft",
